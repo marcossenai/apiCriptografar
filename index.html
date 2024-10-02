@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criptografia API em Node.js</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Criptografia de Mensagens</h1>
+
+    <h2>Criptografar Mensagem</h2>
+    <input type="text" id="encrypt-message" placeholder="Digite a mensagem para criptografar">
+    <button id="encrypt-btn">Criptografar</button>
+    <div id="encrypted-output"></div>
+    <div id="iv-output"></div> 
+
+    <h2>Descriptografar Mensagem</h2>
+    <input type="text" id="iv" placeholder="IV">
+    <input type="text" id="encrypted-data" placeholder="Dados criptografados">
+    <button id="decrypt-btn">Descriptografar</button>
+    <div id="decrypted-output"></div>
+  </div>
+
+  <script>
+    const apiKey = '1234567890abcdef';
+    const baseUrl = 'https://060da11b-4eb4-4b54-b6d9-1d3497543994-00-2654ra3o307xl.janeway.replit.dev/api';
+
+    document.getElementById('encrypt-btn').addEventListener('click', () => {
+      const message = document.getElementById('encrypt-message').value;
+      encryptMessage(message);
+    });
+
+    document.getElementById('decrypt-btn').addEventListener('click', () => {
+      const iv = document.getElementById('iv').value;
+      const encryptedData = document.getElementById('encrypted-data').value;
+      decryptMessage(iv, encryptedData);
+    });
+
+    function encryptMessage(message) {
+      fetch(`${baseUrl}/encrypt`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey
+        },
+        body: JSON.stringify({ message: message })
+      })
+        .then(response => response.json())
+        .then(data => {
+          const encryptedOutput = document.getElementById('encrypted-output');
+          const ivOutput = document.getElementById('iv-output'); // Seleciona o elemento do IV
+          encryptedOutput.innerHTML = `<strong>Mensagem Criptografada:</strong> ${data.encryptedData}`;
+          ivOutput.innerHTML = `<strong>IV:</strong> ${data.iv}`; // Exibe o IV
+        })
+        .catch(error => alert(error.message));
+    }
+
+    function decryptMessage(iv, encryptedData) {
+      fetch(`${baseUrl}/decrypt`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey
+        },
+        body: JSON.stringify({ iv: iv, encryptedData: encryptedData })
+      })
+        .then(response => response.json())
+        .then(data => {
+          const decryptedOutput = document.getElementById('decrypted-output');
+          decryptedOutput.innerHTML = `<strong>Mensagem Descriptografada:</strong> ${data.message}`; // Corrigido o campo
+        })
+        .catch(error => alert(error.message));
+    }
+  </script>
+</body>
+
+</html>
